@@ -1,0 +1,122 @@
+.container {
+  margin: 10px;
+}
+
+#main {
+  background-color: #333;
+  margin: 10px 0;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#main li a {
+  display: block;
+  text-align: center;
+  padding: 14px 16px;
+  color: white;
+  text-decoration: none;
+  background-color: #333;
+  margin: 0;
+  float: left;
+}
+
+#upload {
+  margin: 10px 0;
+}
+
+#search {
+  margin: 10px 0;
+}
+
+#upload li input button {
+  display: block;
+  text-align: center;
+  justify-content: center;
+  text-decoration: none;
+  margin: 0;
+  float: left;
+}
+
+#search ul li label input button {
+  display: block;
+  text-align: center;
+  justify-content: center;
+  text-decoration: none;
+  margin: 0;
+  float: left;
+}
+
+#logout {
+  font-weight: 600;
+  float: right !important;
+  background-color: #047d95 !important;
+}
+
+.container {
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: left;
+  height: 100%;
+}
+
+#homepage {
+  width: 70%
+}
+
+.button {
+  background: #047d95;
+  border: none;
+  padding: 3px 20px;
+  color: white;
+  font-weight: 600;
+  margin: 0px;
+  min-width: 100px;
+  float: right !important;
+}
+
+.button-search {
+  background: #047d95;
+  border: none;
+  padding: 3px 20px;
+  color: white;
+  font-weight: 600;
+  margin: 0px 5px;
+  min-width: 100px;
+}
+
+label {
+  margin: 0 5px 0px 0px;
+}
+
+input {
+  margin: 0 5px 0px 0px;
+}
+
+th {
+  background: #047d95;
+  color: white;
+  padding: 5px;
+}
+
+input {
+  width: max-content;
+}
+
+table {
+  width: 100%;
+}
+
+caption { 
+  caption-side: bottom;
+  margin-top: 10px;
+  font-style: italic;
+}
