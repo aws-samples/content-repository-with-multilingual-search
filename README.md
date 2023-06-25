@@ -33,7 +33,7 @@ The following steps will deploy two AWS CDK stacks into your AWS account:
 
 Clone the project git repository:
 ```bash
-git clone https://github.com/aws-samples/content-repository-with-multilingual-search content-repository
+git clone https://github.com/aws-samples/content-repository-with-multilingual-search 
 ```
 
 Install the necessary dependencies:
