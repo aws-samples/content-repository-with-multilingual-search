@@ -28,8 +28,8 @@ You should have the following prerequisites to deploy the content repository wit
 ## Deployment
 
 The following steps will deploy two AWS CDK stacks into your AWS account:
-* content-repo-search-stack (blog-content-repo-search-stack.ts) creates the environment detailed in the figure above except for the SageMaker endpoint which you create in a separate step. 
-* demo-data-stack (userpool-demo-data-stack.ts) deploys sample users, groups, and role mappings.
+* [content-repo-search-stack](/backend-cdk/lib/blog-content-repo-search-stack.ts) creates the environment detailed in the figure above except for the SageMaker endpoint which you create in a [separate step](#creation-of-sagemaker-endpoint).
+* [demo-data-stack](/backend-cdk/lib/userpool-demo-data-stack.ts) deploys sample users, groups, and role mappings.
 
 Clone the project git repository:
 ```bash
@@ -60,49 +60,53 @@ cdk deploy --all
 
 The complete stack set-up might take up-to 25 minutes. 
 
-Follow below steps to create the SageMaker endpoint:
-1. Open the SageMaker console at [https://console.aws.amazon.com/sagemaker/](https://console.aws.amazon.com/sagemaker/)
-2. Choose **Notebook** instances, then choose **Create notebook instance**.
-3. Under the **Notebook instance settings**, provide a name “content-repo-notebook” to the notebook and leave other defaults as-is.
-4. Under the **Permissions and encryption** section, you would see an IAM role with the prefix content-repo-stack. Leave the rest of the defaults and click on **Create notebook instance**.
-5. You will see that notebook creation will go to *pending* status before its available for use within few minutes.
-6.Once the notebook is in the available status, click on the **Open Jupyter** action.
-7. Click on the **Upload** button on the right to upload the `create-sagemaker-endpoint.ipynb` file in the `backend-cdk` folder of the root of the blog repository.
-8. Open the `create-sagemaker-endpoint.ipynb` notebook and then select the option **Run All** from the **Cell** section to execute all the cells. This might take up-to 10 minutes.
-9. Once all the cells have been successfully executed, verify that the SSM parameter `sagemaker-endpoint` is updated with the value of the SageMaker endpoint name.
-10. Verify that you see deployed Inference endpoint under **Endpoints** in the SageMaker section of the AWS Console.
-11. Upload sample data to the content repository:
-    * Please note that before you execute the script you need to update the `S3_BUCKET_NAME` with the `s3SourceBucketName` from the AWS CDK output of the content-repo-stack. 
-    * Execute `upload_documents_to_S3.sh` script in the root folder of the blog repository to upload the sample review data set. This takes a couple of minutes. 
+### Creation of SageMaker endpoint
+Follow below steps to create the SageMaker endpoint in the same AWS Region where you deployed the AWS CDK stack:
+1. Sign in to the [SageMaker console](https://console.aws.amazon.com/sagemaker/).
+2. In the navigation menu, select **Notebook**, then **Notebook instances**.
+3. Choose **Create notebook instance**.
+4. Under the **Notebook instance settings**, enter `content-repo-notebook` as the notebook instance name, and leave other defaults as-is. .
+5. Under the **Permissions and encryption** section, you need to set the IAM role section to the role with the prefix `content-repo-search-stack`. In case you don’t see this role automatically populated, select it from the drop-down. Leave the rest of the defaults, and choose **Create notebook instance**.
+6. The notebook creation status changes to *Pending* before it’s available for use within 3-4 minutes.
+7. Once the notebook is in the *Available* status, choose **Open Jupyter**.
+8. Choose the **Upload** button and upload the `create-sagemaker-endpoint.ipynb` file in the `backend-cdk` folder of the root of the blog repository.
+9. Open the `create-sagemaker-endpoint.ipynb` notebook. Select the option **Run All** from the **Cell** menu. This might take up to 10 minutes. 
+10. After all the cells have successfully run, verify that [AWS Systems Manager](https://aws.amazon.com/systems-manager/) parameter `sagemaker-endpoint` is updated with the value of the SageMaker endpoint name. You see this value as the output of the cell as shown below. In case you don’t see the output check if the preceding steps were run correctly. 
+11. Verify in the SageMaker console that the inference endpoint with the prefix `tensorflow-inference` has been deployed and is set to status `InService`.
+12. Upload sample data to the content repository:
+    * Update the `S3_BUCKET_NAME` variable in the `upload_documents_to_S3.sh` script in the root folder of the blog repository with the `s3SourceBucketName` from the AWS CDK output of the `content-repo-search-stack`. 
+    * Run `upload_documents_to_S3.sh` script to upload 160 sample documents to the content repository. This takes 5-6 minutes. 
 
 ## Using the search service
 
-The diagram below describes the lifecycle of a user-initiated search request.
+At this stage you have deployed all the building blocks for the content repository in your AWS account. You also pushed a limited corpus of 160 sample documents (.png format) to the content repository. Each document is in one of the four different languages - English, German, Spanish and French. With the added multilingual search capability, you can query in one language and receive semantically similar results across different languages while maintaining the access control logic. The diagram below describes the lifecycle of a user-initiated search request.
 ![image info](./backend-cdk/img/search_lifecycle.png)
 
-1. Access the front-end application
-    * Copy the `amplifyHostedAppUrl` value shown in the AWS CDK output from the content-repo-stack.
-    * Use the URL with your web browser to access the frontend application.
+1. Access the front-end application:
+    * Copy the `amplifyHostedAppUrl` value of the AWS CDK output from the **content-repo-search-stack** shown in the terminal.
+    * Enter the URL in your web browser to access the frontend application.
     * A temporary page displays until the automated build and deployment of the React application completes after 4-5 minutes.
-2. Application sign-in
-    * The react webpage asks you to sign in first, then change the temporary password.
-    * The content repository provides two demo users with credentials as part of the demo-data-stack in the AWS CDK output. Start with the `sales-user` user, which belongs to the `sales` department.
-3. Enter the search query and verify results. For example
-    * Enter “*works well*” as the search query. Note the multi lingual output and the semantically similar results
-    * Check the result for the search query “*bad quality*"
-4. You can re-log in using the `marketing-user` and credentials to verify access control.
-    * This time with “*works well*” you find different output as the `sales-user` thanks to access control that allows `marketing-user` to search only for the documents that belong to the `marketing` department. 
+2. Sign in to the application:
+    * The content repository provides two demo users with credentials as part of the **demo-data-stack** in the AWS CDK output. Copy the password from the terminal associated with the `sales-user`, which belongs to the `sales` department.
+    * Follow the prompts from the React webpage to sign in with the `sales-user` and change the temporary password.
+3. Enter search queries and verify results. For example:
+    * Enter `works well` as the search query. Note the multilingual output and the semantically similar results.
+    * Enter `bad quality` as the search query. Note the multilingual output and the semantically similar results. 
+4. Sign out as the `sales-user` with the **Log Out** button on the webpage.
+4. Sign in using the `marketing-user` credentials to verify access control.
+    * Follow the sign in procedure in step 2 but with the `marketing-user`.
+    * This time with `works well` as search query, you find different output. This is because the access control only allows `marketing-user` to search for the documents that belong to the `marketing` department. 
 
 ### Outlook
-The building blocks of the semantic search for unstructured documents namely Amazon Textract, Amazon SageMaker and Amazon OpenSearch services set a solid foundation for you to customize and enhance the search capabilities as per your specific use-case. For example, you can leverage the fast developments in Large Language Models (LLM) to enhance the semantic search experience by replacing the encoder model with an LLM capable of generating multilingual embedding while still maintaining the OpenSearch service to store and index data and perform vector search. 
+The building blocks of the semantic search for unstructured documents—Amazon Textract, Amazon SageMaker, and Amazon OpenSearch Service—set a foundation for you to customize and enhance the search capabilities for your specific use case. For example, you can leverage the fast developments in [Large Language Models (LLM) to enhance the semantic search experience](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/semantic-question-matching.html). You can replace the encoder model with an LLM capable of generating multilingual embeddings while still maintaining the OpenSearch service to store and index data and perform vector search. 
 
 ## Cleaning up
 
-In the subdirectory “backend-cdk”, delete the deployed resources:
+In the `backend-cdk` subdirectory of the cloned repository, delete the deployed resources:
 ```
 cdk destroy –all 
 ```
-Additionally delete the SageMaker endpoint/notebook instance.
+Additionally, you need to access the Amazon SageMaker console to [delete the SageMaker endpoint and notebook instance](https://docs.aws.amazon.com/sagemaker/latest/dg/ex1-cleanup.html).
 
 ## Useful commands
  * `cdk ls`          list all stacks in the app
