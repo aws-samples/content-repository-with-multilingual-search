@@ -10,12 +10,15 @@ import { DemoDataStack } from '../lib/userpool-demo-data-stack';
 
 const app = new cdk.App();
 
-new BlogContentRepositorySearchStack(app, 'BlogContentRepositorySearchStack', {
+const repository_stack = new BlogContentRepositorySearchStack(app, 'BlogContentRepositorySearchStack', {
   stackName: 'content-repo-search-stack',
   description: 'Creates all resources needed for the content repository with semantic search capability',
 });
 
-new DemoDataStack(app, 'DemoDataStack', {
+const demo_data_stack = new DemoDataStack(app, 'DemoDataStack', {
   stackName: 'demo-data-stack',
   description: 'Creates exemplary Cognito user pool users and groups and maps it to IAM roles with permission policies',
 });
+
+// DemoDataStack depends on resources from the BlogContentRepositorySearchStack
+demo_data_stack.addDependency(repository_stack)
