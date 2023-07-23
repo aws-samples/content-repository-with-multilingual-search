@@ -9,7 +9,7 @@ This example walks you through how to build an end-to-end content repository usi
 ---
 
 ![Stability: Stable](https://img.shields.io/badge/stability-Stable-success.svg?style=for-the-badge)
-> This is a stable example. It should successfully build out of the box.
+> This is a stable example. It should successfully build out of the box. Tested in `us-east-1` region.
 >
 > This prototype is built on CDK construct libraries marked "stable" with the exception of [amplify_alpha](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-amplify-alpha-readme.html) but thoroughly tested.
 <!--END STABILITY BANNER-->

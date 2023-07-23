@@ -66,6 +66,10 @@ def lambda_handler(event, context):
         # start searching a key value that needs to be used for embedding generation
         search_key = ocr_key
         input_txt = search_value(kvs, search_key)
+        
+        if input_txt is None:
+            function_response = f"Textract couldn't read the document {object_key}"
+            continue
 
         try:
             payload_txt = str(input_txt[0])
